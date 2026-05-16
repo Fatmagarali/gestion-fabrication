@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # ========================
+  # Base de données MySQL
+  # ========================
+  mysql:
+    image: mysql:8.0
+    container_name: fabrication-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fabricationdb
+      MYSQL_USER: fabrication
+      MYSQL_PASSWORD: fabrication123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - fabrication-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================
+  # Backend Spring Boot
+  # ========================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fabrication-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DB: fabricationdb
+      MYSQL_USER: fabrication
+      MYSQL_PASSWORD: fabrication123
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - fabrication-network
+    restart: on-failure
+
+volumes:
+  mysql-data:
+
+networks:
+  fabrication-network:
+    driver: bridge
