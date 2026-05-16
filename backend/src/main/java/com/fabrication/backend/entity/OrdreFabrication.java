@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entité représentant un ordre de fabrication.
@@ -46,4 +48,17 @@ public class OrdreFabrication {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EtatOrdre etat;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "machine_id")
+    private Machine machine;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "ordre_employes",
+        joinColumns = @JoinColumn(name = "ordre_id"),
+        inverseJoinColumns = @JoinColumn(name = "employe_id")
+    )
+    @Builder.Default
+    private List<Employe> employes = new ArrayList<>();
 }

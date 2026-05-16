@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * DTO pour la création et mise à jour d'un ordre de fabrication.
@@ -38,4 +39,12 @@ public class OrdreFabricationDTO {
 
     @NotNull(message = "L'état est obligatoire")
     private EtatOrdre etat;
+
+    private Long machineId;
+    
+    // Champ en lecture seule
+    private String machineNom;
+    private String machineEtat;
+    
+    private List<Long> employesIds;
 }

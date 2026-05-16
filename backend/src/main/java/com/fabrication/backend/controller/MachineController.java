@@ -64,4 +64,10 @@ public class MachineController {
     public ResponseEntity<MachineDTO> enregistrerMaintenance(@PathVariable Long id) {
         return ResponseEntity.ok(machineService.enregistrerMaintenance(id));
     }
+
+    @PatchMapping("/{id}/etat")
+    @Operation(summary = "Changer l'état d'une machine")
+    public ResponseEntity<MachineDTO> changerEtat(@PathVariable Long id, @RequestParam EtatMachine etat) {
+        return ResponseEntity.ok(machineService.changerEtat(id, etat));
+    }
 }

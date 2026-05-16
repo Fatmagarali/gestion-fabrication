@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entité représentant un produit.
@@ -38,4 +41,13 @@ public class Produit {
     @NotBlank(message = "Le fournisseur est obligatoire")
     @Column(nullable = false)
     private String fournisseur;
+
+    @ManyToMany
+    @JoinTable(
+        name = "produit_composition",
+        joinColumns = @JoinColumn(name = "produit_parent_id"),
+        inverseJoinColumns = @JoinColumn(name = "produit_enfant_id")
+    )
+    @Builder.Default
+    private List<Produit> composants = new ArrayList<>();
 }

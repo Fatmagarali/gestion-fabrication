@@ -93,10 +93,16 @@ public class MachineService {
                 .orElseThrow(() -> new ResourceNotFoundException("Machine", id));
 
         machine.setDerniereMaintenance(LocalDate.now());
-        machine.setEtat(EtatMachine.DISPONIBLE);
 
         Machine updated = machineRepository.save(machine);
         return toDTO(updated);
+    }
+
+    public MachineDTO changerEtat(Long id, EtatMachine nouvelEtat) {
+        Machine machine = machineRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Machine", id));
+        machine.setEtat(nouvelEtat);
+        return toDTO(machineRepository.save(machine));
     }
 
     // ===== Mappers =====

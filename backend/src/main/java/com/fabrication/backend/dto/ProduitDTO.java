@@ -29,4 +29,7 @@ public class ProduitDTO {
 
     @NotBlank(message = "Le fournisseur est obligatoire")
     private String fournisseur;
+
+    private java.util.List<Long> composantsIds;
+    private java.util.List<String> composantsNoms;
 }

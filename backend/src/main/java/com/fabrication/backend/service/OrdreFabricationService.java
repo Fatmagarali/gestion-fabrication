@@ -5,6 +5,10 @@ import com.fabrication.backend.entity.EtatOrdre;
 import com.fabrication.backend.entity.OrdreFabrication;
 import com.fabrication.backend.entity.Produit;
 import com.fabrication.backend.exception.ResourceNotFoundException;
+import com.fabrication.backend.entity.Employe;
+import com.fabrication.backend.entity.Machine;
+import com.fabrication.backend.repository.EmployeRepository;
+import com.fabrication.backend.repository.MachineRepository;
 import com.fabrication.backend.repository.OrdreFabricationRepository;
 import com.fabrication.backend.repository.ProduitRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,8 @@ public class OrdreFabricationService {
 
     private final OrdreFabricationRepository ordreFabricationRepository;
     private final ProduitRepository produitRepository;
+    private final MachineRepository machineRepository;
+    private final EmployeRepository employeRepository;
 
     /**
      * Récupérer tous les ordres de fabrication.
@@ -59,6 +65,13 @@ public class OrdreFabricationService {
         OrdreFabrication ordre = ordreFabricationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ordre de fabrication", id));
 
+        // Si l'état passe à TERMINE (et ne l'était pas avant), on augmente le stock du produit fini
+        if (dto.getEtat() == EtatOrdre.TERMINE && ordre.getEtat() != EtatOrdre.TERMINE) {
+            Produit produitAssocie = ordre.getProduit();
+            produitAssocie.setStock(produitAssocie.getStock() + dto.getQuantite());
+            produitRepository.save(produitAssocie);
+        }
+
         ordre.setProjet(dto.getProjet());
         ordre.setQuantite(dto.getQuantite());
         ordre.setDate(dto.getDate());
@@ -68,6 +81,21 @@ public class OrdreFabricationService {
             Produit produit = produitRepository.findById(dto.getProduitId())
                     .orElseThrow(() -> new ResourceNotFoundException("Produit", dto.getProduitId()));
             ordre.setProduit(produit);
+        }
+
+        if (dto.getMachineId() != null) {
+            Machine machine = machineRepository.findById(dto.getMachineId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Machine", dto.getMachineId()));
+            ordre.setMachine(machine);
+        } else {
+            ordre.setMachine(null);
+        }
+
+        if (dto.getEmployesIds() != null && !dto.getEmployesIds().isEmpty()) {
+            List<Employe> employes = employeRepository.findAllById(dto.getEmployesIds());
+            ordre.setEmployes(employes);
+        } else {
+            ordre.setEmployes(new java.util.ArrayList<>());
         }
 
         OrdreFabrication updated = ordreFabricationRepository.save(ordre);
@@ -90,6 +118,13 @@ public class OrdreFabricationService {
     public OrdreFabricationDTO changerEtat(Long id, EtatOrdre nouvelEtat) {
         OrdreFabrication ordre = ordreFabricationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ordre de fabrication", id));
+
+        // Si l'état passe à TERMINE (et ne l'était pas avant), on augmente le stock
+        if (nouvelEtat == EtatOrdre.TERMINE && ordre.getEtat() != EtatOrdre.TERMINE) {
+            Produit produitAssocie = ordre.getProduit();
+            produitAssocie.setStock(produitAssocie.getStock() + ordre.getQuantite());
+            produitRepository.save(produitAssocie);
+        }
 
         ordre.setEtat(nouvelEtat);
         OrdreFabrication updated = ordreFabricationRepository.save(ordre);
@@ -137,6 +172,10 @@ public class OrdreFabricationService {
                 .quantite(ordre.getQuantite())
                 .date(ordre.getDate())
                 .etat(ordre.getEtat())
+                .machineId(ordre.getMachine() != null ? ordre.getMachine().getId() : null)
+                .machineNom(ordre.getMachine() != null ? ordre.getMachine().getNom() : null)
+                .machineEtat(ordre.getMachine() != null ? ordre.getMachine().getEtat().name() : null)
+                .employesIds(ordre.getEmployes() != null ? ordre.getEmployes().stream().map(Employe::getId).collect(Collectors.toList()) : null)
                 .build();
     }
 
@@ -144,12 +183,25 @@ public class OrdreFabricationService {
         Produit produit = produitRepository.findById(dto.getProduitId())
                 .orElseThrow(() -> new ResourceNotFoundException("Produit", dto.getProduitId()));
 
+        Machine machine = null;
+        if (dto.getMachineId() != null) {
+            machine = machineRepository.findById(dto.getMachineId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Machine", dto.getMachineId()));
+        }
+
+        List<Employe> employes = new java.util.ArrayList<>();
+        if (dto.getEmployesIds() != null && !dto.getEmployesIds().isEmpty()) {
+            employes = employeRepository.findAllById(dto.getEmployesIds());
+        }
+
         return OrdreFabrication.builder()
                 .projet(dto.getProjet())
                 .produit(produit)
                 .quantite(dto.getQuantite())
                 .date(dto.getDate())
                 .etat(dto.getEtat())
+                .machine(machine)
+                .employes(employes)
                 .build();
     }
 }

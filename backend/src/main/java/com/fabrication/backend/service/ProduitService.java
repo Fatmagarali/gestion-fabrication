@@ -102,15 +102,23 @@ public class ProduitService {
                 .type(produit.getType())
                 .stock(produit.getStock())
                 .fournisseur(produit.getFournisseur())
+                .composantsIds(produit.getComposants() != null ? produit.getComposants().stream().map(Produit::getId).collect(Collectors.toList()) : null)
+                .composantsNoms(produit.getComposants() != null ? produit.getComposants().stream().map(Produit::getNom).collect(Collectors.toList()) : null)
                 .build();
     }
 
     private Produit toEntity(ProduitDTO dto) {
+        List<Produit> components = new java.util.ArrayList<>();
+        if (dto.getComposantsIds() != null) {
+            components = produitRepository.findAllById(dto.getComposantsIds());
+        }
+
         return Produit.builder()
                 .nom(dto.getNom())
                 .type(dto.getType())
                 .stock(dto.getStock())
                 .fournisseur(dto.getFournisseur())
+                .composants(components)
                 .build();
     }
 }
