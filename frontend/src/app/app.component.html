@@ -1,0 +1,34 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span style="font-size: 1.5rem;">⚙️</span>
+      <span>FabManager</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a routerLink="/ordres" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <span>📋</span> Ordres de Fabrication
+      </a>
+      <a routerLink="/ordres/nouveau" routerLinkActive="active" class="nav-item">
+        <span>➕</span> Ajouter un Ordre
+      </a>
+      <a routerLink="/machines" routerLinkActive="active" class="nav-item">
+        <span>🤖</span> Machines
+      </a>
+      <a routerLink="/employes" routerLinkActive="active" class="nav-item">
+        <span>👷</span> Employés
+      </a>
+      <a routerLink="/produits" routerLinkActive="active" class="nav-item">
+        <span>📦</span> Stock & Produits
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container animate-fade-in">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,90 @@
+<div class="page-header">
+  <h1 class="page-title">Gestion des Produits et Stocks</h1>
+  <!-- Le bouton 'Ajouter' n'est pas encore implémenté mais préparé pour plus tard -->
+  <button class="btn btn-primary animate-fade-in" routerLink="/produits/nouveau">
+    + Nouveau Produit
+  </button>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="loading">
+  <p>Chargement des produits...</p>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="error">
+  <p style="color: var(--danger-color);">{{ error }}</p>
+  <button class="btn btn-secondary mt-2" (click)="loadProduits()">Réessayer</button>
+</div>
+
+<!-- Barre de navigation des catégories -->
+<div class="animate-fade-in" *ngIf="!loading && !error" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
+  <button *ngFor="let type of types" 
+          class="btn" 
+          [ngClass]="activeFilter === type ? 'btn-primary' : 'btn-secondary'"
+          (click)="applyFilter(type)"
+          style="border-radius: 99px; padding: 0.5rem 1.25rem;">
+    {{ type === 'Tous' ? '🌐' : (type === 'Matière première' ? '🛢️' : (type === 'Composant' ? '⚙️' : '📦')) }} 
+    {{ type }}
+  </button>
+</div>
+
+<div class="table-container animate-fade-in" *ngIf="!loading && !error">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom du Produit</th>
+        <th>Type</th>
+        <th>Stock Actuel</th>
+        <th>État du Stock</th>
+        <th>Fournisseur</th>
+        <th style="text-align: right;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let prod of filteredProduits">
+        <td>
+          <span style="color: var(--text-muted); font-size: 0.9rem;">#{{ prod.id }}</span>
+        </td>
+        <td style="font-weight: 600; color: var(--text-dark);">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">{{ prod.type === 'Matière première' ? '🛢️' : '📦' }}</span>
+            {{ prod.nom }}
+          </div>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="{'badge-info': prod.type === 'Matière première', 'badge-success': prod.type === 'Produit fini', 'badge-warning': prod.type === 'Composant'}">
+            {{ prod.type }}
+          </span>
+        </td>
+        <td>
+          <span class="badge" style="background: #f1f5f9; color: #475569; font-size: 0.9rem; padding: 0.4rem 0.8rem;">
+            {{ prod.stock }}
+          </span>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="getStockStatus(prod.stock).class" style="gap: 0.25rem;">
+            {{ getStockStatus(prod.stock).icon }} {{ getStockStatus(prod.stock).text }}
+          </span>
+        </td>
+        <td style="color: var(--text-muted);">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span>🏢</span> {{ prod.fournisseur }}
+          </div>
+        </td>
+        <td style="text-align: right;">
+          <button *ngIf="prod.type === 'Matière première'" 
+                  class="btn" 
+                  style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;"
+                  (click)="passerOrdreAchat(prod)">
+            🛒 Acheter
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredProduits.length === 0">
+        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted); font-size: 1.1rem;">
+          📭 Aucun produit trouvé dans cette catégorie.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h1 class="page-title">Gestion des Machines</h1>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="loading">
+  <p>Chargement des machines...</p>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="error">
+  <p style="color: var(--danger-color);">{{ error }}</p>
+  <button class="btn btn-secondary mt-2" (click)="loadMachines()">Réessayer</button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 animate-fade-in" *ngIf="!loading && !error">
+  <div class="glass-card" *ngFor="let machine of machines" style="display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <h3 style="margin-bottom: 0.25rem;">{{ machine.nom }}</h3>
+        <span style="font-size: 0.875rem; color: var(--text-muted);">ID: #{{ machine.id }}</span>
+      </div>
+      <span class="badge" [ngClass]="getBadgeClass(machine.etat)" style="padding: 0.5rem 1rem;">{{ machine.etat }}</span>
+    </div>
+
+    <!-- Sélecteur d'état rapide -->
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Changer l'état :</label>
+      <select class="form-control" style="font-size: 0.85rem; padding: 0.4rem;" 
+              [value]="machine.etat"
+              (change)="changerEtat(machine.id, $any($event.target).value)">
+        <option *ngFor="let et of etats" [value]="et">{{ et }}</option>
+      </select>
+    </div>
+    
+    <div style="background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px;">
+      <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">
+        <strong>Dernière Maintenance:</strong><br>
+        {{ machine.derniereMaintenance || 'Jamais' }}
+      </p>
+    </div>
+
+    <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+      <button class="btn btn-primary" style="width: 100%;" 
+              (click)="enregistrerMaintenance(machine.id)">
+        🛠️ Enregistrer Maintenance
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="machines.length === 0" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);" class="glass-card">
+    Aucune machine trouvée.
+  </div>
+</div>

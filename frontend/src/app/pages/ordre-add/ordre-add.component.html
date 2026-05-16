@@ -1,0 +1,91 @@
+<div class="page-header">
+  <h1 class="page-title">Créer un Ordre de Fabrication</h1>
+  <button class="btn btn-secondary animate-fade-in" onclick="history.back()">
+    Retour
+  </button>
+</div>
+
+<div class="glass-card animate-fade-in" style="max-width: 600px; margin: 0 auto;">
+  <div *ngIf="error" style="background-color: var(--danger-color); color: white; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+    {{ error }}
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #ordreForm="ngForm">
+    <div class="form-group">
+      <label class="form-label" for="projet">Nom du Projet *</label>
+      <input type="text" id="projet" name="projet" class="form-control" [(ngModel)]="ordre.projet" required placeholder="Ex: Châssis Alpha">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="produitId">Produit à fabriquer *</label>
+      <select id="produitId" name="produitId" class="form-control" [(ngModel)]="ordre.produitId" required style="cursor: pointer; padding: 0.85rem;">
+        <option [ngValue]="undefined" disabled>-- Sélectionner le produit à fabriquer --</option>
+        
+        <optgroup label="📦 Produits Finis (Prêts pour la vente)">
+          <option *ngFor="let prod of produitsFinis" [ngValue]="prod.id">
+            {{ prod.nom }} — (En stock: {{ prod.stock }})
+          </option>
+        </optgroup>
+
+        <optgroup label="⚙️ Composants (Assemblages intermédiaires)">
+          <option *ngFor="let prod of composants" [ngValue]="prod.id">
+            {{ prod.nom }} — (En stock: {{ prod.stock }})
+          </option>
+        </optgroup>
+
+        <optgroup label="🛢️ Matières premières (Achat uniquement)" disabled>
+          <option *ngFor="let prod of matieresPremieres" [ngValue]="prod.id">
+            {{ prod.nom }} — (En stock: {{ prod.stock }})
+          </option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="grid grid-cols-2">
+      <div class="form-group">
+        <label class="form-label" for="quantite">Quantité *</label>
+        <input type="number" id="quantite" name="quantite" class="form-control" [(ngModel)]="ordre.quantite" required min="1">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="date">Date de planification *</label>
+        <input type="date" id="date" name="date" class="form-control" [(ngModel)]="ordre.date" required>
+      </div>
+    </div>
+
+    <!-- Choix de la machine -->
+    <div class="form-group">
+      <label class="form-label" for="machineId">Machine à utiliser</label>
+      <select id="machineId" name="machineId" class="form-control" [(ngModel)]="ordre.machineId" style="cursor: pointer; padding: 0.85rem;">
+        <option [ngValue]="undefined">-- Aucune machine / À définir plus tard --</option>
+        <option *ngFor="let mach of machines" [ngValue]="mach.id">
+          🤖 {{ mach.nom }} (État: {{ mach.etat }})
+        </option>
+      </select>
+    </div>
+
+    <!-- Choix des employés -->
+    <div class="form-group">
+      <label class="form-label">Équipe (Employés assignés)</label>
+      <div class="glass-card" style="padding: 1rem; border-radius: 8px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; background: rgba(255,255,255,0.5);">
+        <label *ngFor="let emp of employes" style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.9rem;">
+          <input type="checkbox" *ngIf="emp.id" [(ngModel)]="selectedEmployes[emp.id]" name="emp_{{emp.id}}" style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary-color);">
+          <span style="font-weight: 500;">{{ emp.nom }}</span> 
+          <span style="color: var(--text-muted); font-size: 0.8rem;">— {{ emp.poste }}</span>
+          <span *ngIf="emp.machineAssigneeNom" class="badge badge-info" style="font-size: 0.7rem; margin-left: auto;">
+            🤖 {{ emp.machineAssigneeNom }}
+          </span>
+        </label>
+        <div *ngIf="employes.length === 0" style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;">
+          Aucun employé trouvé.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+      <button type="submit" class="btn btn-primary" [disabled]="submitting || !ordreForm.valid" style="padding: 0.75rem 2rem; font-size: 1rem;">
+        {{ submitting ? 'Création...' : 'Créer l\'ordre' }}
+      </button>
+    </div>
+  </form>
+</div>

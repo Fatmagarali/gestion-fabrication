@@ -1,0 +1,75 @@
+<div class="page-header">
+  <h1 class="page-title">Liste des Ordres de Fabrication</h1>
+  <button class="btn btn-primary animate-fade-in" onclick="document.querySelector('a[href=\'/ordres/nouveau\']')?.click()">
+    + Nouvel Ordre
+  </button>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="loading">
+  <p>Chargement des ordres...</p>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="error">
+  <p style="color: var(--danger-color);">{{ error }}</p>
+  <button class="btn btn-secondary mt-2" (click)="loadOrdres()">Réessayer</button>
+</div>
+
+<div class="table-container animate-fade-in" *ngIf="!loading && !error">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Projet</th>
+        <th>Produit</th>
+        <th>Quantité</th>
+        <th>Date</th>
+        <th>Machine</th>
+        <th>État</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ordre of ordres">
+        <td>
+          <span style="color: var(--text-muted); font-size: 0.9rem;">#{{ ordre.id }}</span>
+        </td>
+        <td style="font-weight: 600; color: var(--primary-color);">{{ ordre.projet }}</td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">📦</span>
+            {{ ordre.produitNom }}
+          </div>
+        </td>
+        <td><span class="badge" style="background: #f1f5f9; color: #475569;">{{ ordre.quantite }}</span></td>
+        <td style="color: var(--text-muted);">{{ ordre.date }}</td>
+        <td>
+          <div *ngIf="ordre.machineNom" style="display: flex; align-items: center; gap: 0.5rem;">
+            <span>🤖</span>
+            <span>{{ ordre.machineNom }}</span>
+            <span *ngIf="ordre.machineEtat" 
+                  [title]="'État: ' + ordre.machineEtat"
+                  [style.color]="ordre.machineEtat === 'EN_PANNE' ? 'var(--danger-color)' : (ordre.machineEtat === 'EN_MAINTENANCE' ? 'var(--warning-color)' : 'var(--success-color)')">
+              {{ ordre.machineEtat === 'EN_PANNE' ? '⚠️' : (ordre.machineEtat === 'EN_MAINTENANCE' ? '🔧' : '🟢') }}
+            </span>
+          </div>
+          <span *ngIf="!ordre.machineNom" style="color: var(--text-muted); font-style: italic;">Non assignée</span>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="getBadgeClass(ordre.etat)">{{ ordre.etat }}</span>
+        </td>
+        <td>
+          <select class="form-control" style="width: auto; display: inline-block; padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" 
+                  (change)="changerEtat(ordre.id, $any($event.target).value)" 
+                  [value]="ordre.etat">
+            <option *ngFor="let etat of etats" value="{{ etat }}">{{ etat }}</option>
+          </select>
+        </td>
+      </tr>
+      <tr *ngIf="ordres.length === 0">
+        <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Aucun ordre de fabrication trouvé.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

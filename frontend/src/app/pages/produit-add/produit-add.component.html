@@ -1,0 +1,62 @@
+<div class="page-header">
+  <h1 class="page-title">Ajouter un Nouveau Produit</h1>
+  <button class="btn btn-secondary" routerLink="/produits">Retour à la liste</button>
+</div>
+
+<div class="glass-card animate-fade-in" style="max-width: 800px; margin: 0 auto;">
+  <form (ngSubmit)="onSubmit()" #produitForm="ngForm">
+    <div class="error-message" *ngIf="error">{{ error }}</div>
+
+    <div class="form-group">
+      <label class="form-label" for="nom">Nom du Produit *</label>
+      <input type="text" id="nom" name="nom" class="form-control" [(ngModel)]="produit.nom" required placeholder="Ex: Détergent Liquide 1L">
+    </div>
+
+    <div class="grid grid-cols-2">
+      <div class="form-group">
+        <label class="form-label" for="type">Type de Produit *</label>
+        <select id="type" name="type" class="form-control" [(ngModel)]="produit.type" (change)="onTypeChange()" required>
+          <option value="Matière première">🛢️ Matière première</option>
+          <option value="Composant">⚙️ Composant</option>
+          <option value="Produit fini">📦 Produit fini</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="fournisseur">Fournisseur / Fabricant *</label>
+        <input type="text" id="fournisseur" name="fournisseur" class="form-control" [(ngModel)]="produit.fournisseur" required placeholder="Ex: Usine Nord">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="stock">Stock Initial</label>
+      <input type="number" id="stock" name="stock" class="form-control" [(ngModel)]="produit.stock" min="0">
+    </div>
+
+    <!-- Section Composition (BOM) -->
+    <div class="form-group animate-fade-in" *ngIf="produit.type !== 'Matière première'">
+      <label class="form-label">Composition du Produit (Recette)</label>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+        Sélectionnez les éléments nécessaires pour fabriquer ce {{ produit.type === 'Produit fini' ? 'produit fini' : 'composant' }}.
+      </p>
+      <div class="glass-card" style="padding: 1rem; border-radius: 8px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; background: rgba(255,255,255,0.5);">
+        <label *ngFor="let item of matieresEtComposants" style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.9rem;">
+          <input type="checkbox" [(ngModel)]="selectedComposants[$any(item.id)]" name="item_{{item.id}}" style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary-color);">
+          <span style="font-weight: 500;">{{ item.nom }}</span> 
+          <span class="badge" [ngClass]="item.type === 'Matière première' ? 'badge-info' : 'badge-warning'" style="font-size: 0.7rem; margin-left: auto;">
+            {{ item.type }}
+          </span>
+        </label>
+        <div *ngIf="matieresEtComposants.length === 0" style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;">
+          Aucun ingrédient compatible trouvé.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+      <button type="submit" class="btn btn-primary" [disabled]="submitting || !produitForm.valid" style="padding: 0.75rem 2rem; font-size: 1rem;">
+        {{ submitting ? 'Enregistrement...' : 'Enregistrer le Produit' }}
+      </button>
+    </div>
+  </form>
+</div>

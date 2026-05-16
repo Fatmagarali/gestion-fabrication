@@ -1,0 +1,63 @@
+<div class="page-header">
+  <h1 class="page-title">Gestion des Employés</h1>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="loading">
+  <p>Chargement des données...</p>
+</div>
+
+<div class="glass-card animate-fade-in" *ngIf="error">
+  <p style="color: var(--danger-color);">{{ error }}</p>
+  <button class="btn btn-secondary mt-2" (click)="loadData()">Réessayer</button>
+</div>
+
+<div class="table-container animate-fade-in" *ngIf="!loading && !error">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Poste</th>
+        <th>Machine Assignée</th>
+        <th>Actions d'Affectation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let employe of employes">
+        <td>#{{ employe.id }}</td>
+        <td style="font-weight: 500;">{{ employe.nom }}</td>
+        <td>{{ employe.poste }}</td>
+        <td>
+          <span *ngIf="employe.machineAssigneeId" class="badge badge-success">
+            {{ employe.machineAssigneeNom }}
+          </span>
+          <span *ngIf="!employe.machineAssigneeId" class="badge badge-warning">
+            Aucune
+          </span>
+        </td>
+        <td>
+          <div *ngIf="employe.machineAssigneeId" style="display: flex; gap: 0.5rem; align-items: center;">
+            <button class="btn btn-danger" (click)="desassigner(employe.id)" style="padding: 0.25rem 0.5rem;">
+              Désassigner
+            </button>
+          </div>
+          
+          <div *ngIf="!employe.machineAssigneeId" style="display: flex; gap: 0.5rem; align-items: center;">
+            <select #machineSelect class="form-control" style="width: auto; padding: 0.25rem; font-size: 0.75rem;">
+              <option value="" disabled selected>Sélectionner machine</option>
+              <option *ngFor="let machine of machines" [value]="machine.id">{{ machine.nom }}</option>
+            </select>
+            <button class="btn btn-primary" (click)="assigner(employe.id, machineSelect.value)" style="padding: 0.25rem 0.5rem;">
+              Assigner
+            </button>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="employes.length === 0">
+        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+          Aucun employé trouvé.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
