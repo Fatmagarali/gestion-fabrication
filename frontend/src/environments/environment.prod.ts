@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  apiUrl: 'https://fabrication-backend-62780203004.europe-west1.run.app/api'
 };
