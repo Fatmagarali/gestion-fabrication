@@ -19,8 +19,8 @@ Ce projet permet de :
 | Spring Boot | 3.4.5 | Framework principal |
 | Spring Data JPA | 3.4.x | Accès aux données |
 | Spring Validation | 3.4.x | Validation des données |
-| H2 Database | - | Base de données en mémoire (développement) |
-| MySQL | 8.0 | Base de données (production/Docker) |
+| MySQL | 8.0 | Base de données |
+| Cloud SQL (Google) | - | Base de données managée (production) |
 | Lombok | - | Réduction du code boilerplate |
 | SpringDoc OpenAPI | 2.8.6 | Documentation Swagger |
 | Docker | - | Conteneurisation |
@@ -28,7 +28,7 @@ Ce projet permet de :
 ### Front-end
 | Technologie | Description |
 |---|---|
-| Angular | Framework UI (recommandé) |
+| Angular | Framework UI |
 
 ## Structure du Projet
 
