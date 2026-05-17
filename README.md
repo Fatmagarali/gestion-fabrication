@@ -90,7 +90,24 @@ Cela démarre :
 ```bash
 docker-compose down
 ```
+## Liens de Déploiement (Production)
 
+L'application est déployée sur **Google Cloud Run** :
+
+| Service | URL |
+|---|---|
+| Frontend (Angular) | https://fabrication-frontend-62780203004.europe-west1.run.app |
+| Backend (API REST) | https://fabrication-backend-62780203004.europe-west1.run.app |
+| Swagger UI | https://fabrication-backend-62780203004.europe-west1.run.app/swagger-ui.html |
+| API Docs | https://fabrication-backend-62780203004.europe-west1.run.app/api-docs |
+
+### Infrastructure Cloud (GCP)
+| Composant | Service GCP |
+|---|---|
+| Backend | Cloud Run |
+| Frontend | Cloud Run |
+| Base de données | Cloud SQL (MySQL 8.0) |
+| Registry Docker | Artifact Registry |
 ## Endpoints API
 
 ### Produits (`/api/produits`)
