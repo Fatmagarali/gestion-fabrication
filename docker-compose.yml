@@ -1,8 +1,9 @@
 version: '3.8'
 
 services:
+
   # ========================
-  # Base de données MySQL
+  # MySQL
   # ========================
   mysql:
     image: mysql:8.0
@@ -40,13 +41,28 @@ services:
       MYSQL_USER: fabrication
       MYSQL_PASSWORD: fabrication123
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - fabrication-network
     restart: on-failure
+
+  # ========================
+  # Frontend Angular
+  # ========================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fabrication-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - fabrication-network
 
 volumes:
   mysql-data:
